@@ -2,7 +2,7 @@
   "name": "AR Repair - Visual Repair Guide",
   "short_name": "AR Repair",
   "description": "Point your camera at broken devices for step-by-step repair instructions with AR overlays",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1a1a2e",

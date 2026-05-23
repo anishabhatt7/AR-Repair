@@ -1,17 +1,17 @@
-const CACHE_NAME = 'ar-repair-v9';
+const CACHE_NAME = 'ar-repair-v10';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/camera.js',
-  '/js/canvas-overlay.js',
-  '/js/claude-api.js',
-  '/js/knowledge-base.js',
-  '/js/demo-repairs.js',
-  '/js/ui.js',
-  '/data/repairs.json',
-  '/manifest.json'
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/app.js',
+  './js/camera.js',
+  './js/canvas-overlay.js',
+  './js/claude-api.js',
+  './js/knowledge-base.js',
+  './js/demo-repairs.js',
+  './js/ui.js',
+  './data/repairs.json',
+  './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -31,7 +31,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('api.anthropic.com')) {
+  if (event.request.url.includes('api.anthropic.com') || event.request.url.includes('googleapis.com')) {
     event.respondWith(fetch(event.request));
     return;
   }
