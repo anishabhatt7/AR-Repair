@@ -1,0 +1,312 @@
+{
+  "version": "1.0",
+  "categories": {
+    "printer": {
+      "display_name": "Printer",
+      "brands": ["HP", "Canon", "Epson", "Brother"]
+    },
+    "router": {
+      "display_name": "Router / Modem",
+      "brands": ["Netgear", "TP-Link", "Linksys", "ASUS", "Google"]
+    },
+    "appliance": {
+      "display_name": "Home Appliance",
+      "brands": ["Keurig", "Dyson", "iRobot", "Instant Pot", "Ninja"]
+    },
+    "laptop": {
+      "display_name": "Laptop / Computer",
+      "brands": ["Dell", "HP", "Lenovo", "Apple", "ASUS"]
+    },
+    "phone": {
+      "display_name": "Phone / Tablet",
+      "brands": ["Apple", "Samsung", "Google", "OnePlus"]
+    }
+  },
+  "products": [
+    {
+      "id": "hp-deskjet-2700",
+      "category": "printer",
+      "brand": "HP",
+      "model": "DeskJet 2700",
+      "aliases": ["HP 2700", "DeskJet 2700 All-in-One", "HP DeskJet 2700e"],
+      "common_problems": [
+        {
+          "id": "paper-jam",
+          "problem": "Paper jam",
+          "symptoms": ["paper stuck", "grinding noise", "error light blinking", "paper won't feed"],
+          "difficulty": "easy",
+          "tools_needed": [],
+          "estimated_time": "5 minutes",
+          "safety_warnings": ["Turn off printer before clearing jam"],
+          "steps": [
+            {
+              "instruction": "Turn off the printer using the power button on top",
+              "visual_cues": ["power button", "top panel"]
+            },
+            {
+              "instruction": "Open the front access door by pulling it toward you",
+              "visual_cues": ["front panel", "small handle at bottom edge"]
+            },
+            {
+              "instruction": "Gently pull out any jammed paper with both hands, pulling slowly toward you",
+              "visual_cues": ["paper visible", "rollers"]
+            },
+            {
+              "instruction": "Check the rear access door for any remaining paper scraps",
+              "visual_cues": ["back of printer", "rear door latch"]
+            },
+            {
+              "instruction": "Close all doors and turn the printer back on",
+              "visual_cues": ["front door", "power button"]
+            }
+          ]
+        },
+        {
+          "id": "ink-not-printing",
+          "problem": "Not printing or streaky prints",
+          "symptoms": ["blank pages", "streaky", "faded", "missing colors", "lines on paper"],
+          "difficulty": "easy",
+          "tools_needed": [],
+          "estimated_time": "10 minutes",
+          "safety_warnings": [],
+          "steps": [
+            {
+              "instruction": "Open the ink cartridge access door on the front of the printer",
+              "visual_cues": ["front panel lifts up", "cartridge door"]
+            },
+            {
+              "instruction": "Wait for the cartridge carriage to move to the center",
+              "visual_cues": ["cartridge holder", "slides to middle"]
+            },
+            {
+              "instruction": "Press down on the cartridge and pull it out toward you",
+              "visual_cues": ["cartridge tab", "push down then pull"]
+            },
+            {
+              "instruction": "Gently wipe the copper-colored contacts with a dry lint-free cloth",
+              "visual_cues": ["copper contacts", "bottom of cartridge"]
+            },
+            {
+              "instruction": "Slide the cartridge back in until it clicks, then close the door",
+              "visual_cues": ["slot", "push until click"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "netgear-nighthawk-r7000",
+      "category": "router",
+      "brand": "Netgear",
+      "model": "Nighthawk R7000",
+      "aliases": ["Netgear R7000", "Nighthawk AC1900", "R7000"],
+      "common_problems": [
+        {
+          "id": "no-internet",
+          "problem": "No internet connection",
+          "symptoms": ["no internet", "wifi connected but no internet", "orange light", "no connection"],
+          "difficulty": "easy",
+          "tools_needed": [],
+          "estimated_time": "5 minutes",
+          "safety_warnings": [],
+          "steps": [
+            {
+              "instruction": "Find the power button on the back of the router and turn it off",
+              "visual_cues": ["back panel", "power button/switch"]
+            },
+            {
+              "instruction": "Unplug the power cable from the back of the router",
+              "visual_cues": ["power port", "round plug"]
+            },
+            {
+              "instruction": "Wait 30 seconds (this clears the router's memory)",
+              "visual_cues": []
+            },
+            {
+              "instruction": "Plug the power cable back in and turn the router on",
+              "visual_cues": ["power port", "power button"]
+            },
+            {
+              "instruction": "Wait 2 minutes for all lights to turn solid. The internet light should turn white/green",
+              "visual_cues": ["LED lights on front", "internet globe icon"]
+            }
+          ]
+        },
+        {
+          "id": "slow-wifi",
+          "problem": "Slow WiFi speed",
+          "symptoms": ["slow internet", "buffering", "laggy", "wifi slow"],
+          "difficulty": "easy",
+          "tools_needed": [],
+          "estimated_time": "3 minutes",
+          "safety_warnings": [],
+          "steps": [
+            {
+              "instruction": "Check the antennas on top - make sure they are pointing straight up",
+              "visual_cues": ["antennas", "top of router"]
+            },
+            {
+              "instruction": "Make sure the router is not blocked by objects or tucked in a cabinet",
+              "visual_cues": ["surrounding area", "ventilation"]
+            },
+            {
+              "instruction": "Look at the back for the reset button - use a paperclip to press and hold for 3 seconds (NOT 10 seconds)",
+              "visual_cues": ["reset pinhole", "back panel"]
+            },
+            {
+              "instruction": "Wait for the router to restart, then test your connection again",
+              "visual_cues": ["front LED lights", "power light"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "keurig-k-classic",
+      "category": "appliance",
+      "brand": "Keurig",
+      "model": "K-Classic",
+      "aliases": ["Keurig K50", "Keurig Classic", "K-Classic K50"],
+      "common_problems": [
+        {
+          "id": "not-brewing",
+          "problem": "Not brewing or partial cup",
+          "symptoms": ["won't brew", "only drips", "partial cup", "no water coming out", "short cup"],
+          "difficulty": "easy",
+          "tools_needed": ["paperclip"],
+          "estimated_time": "10 minutes",
+          "safety_warnings": ["Unplug and let cool before cleaning needle"],
+          "steps": [
+            {
+              "instruction": "Turn off the machine and unplug it. Let it cool for 5 minutes",
+              "visual_cues": ["power button", "back plug"]
+            },
+            {
+              "instruction": "Remove the water reservoir by lifting it straight up",
+              "visual_cues": ["water tank on left side", "lifts off"]
+            },
+            {
+              "instruction": "Open the K-Cup holder by lifting the handle. Look for the needle on top",
+              "visual_cues": ["lift handle", "sharp needle inside top"]
+            },
+            {
+              "instruction": "Straighten a paperclip and gently insert it into the needle hole to clear any clogs",
+              "visual_cues": ["needle hole", "tiny opening in the needle tip"]
+            },
+            {
+              "instruction": "Replace the reservoir with fresh water, plug in, and run a brew cycle without a K-Cup to flush",
+              "visual_cues": ["water tank", "brew button"]
+            }
+          ]
+        },
+        {
+          "id": "descale",
+          "problem": "Descale light is on",
+          "symptoms": ["descale light", "descale message", "slow brewing", "tastes bad"],
+          "difficulty": "easy",
+          "tools_needed": ["white vinegar or descaling solution"],
+          "estimated_time": "45 minutes",
+          "safety_warnings": ["Do not use bleach or harsh chemicals"],
+          "steps": [
+            {
+              "instruction": "Empty the water reservoir completely",
+              "visual_cues": ["water tank", "pour out water"]
+            },
+            {
+              "instruction": "Fill the reservoir with white vinegar (or Keurig descaling solution) up to the MAX line",
+              "visual_cues": ["MAX fill line", "reservoir"]
+            },
+            {
+              "instruction": "Place a large mug on the drip tray. Run brew cycles (no K-Cup) until the reservoir is empty",
+              "visual_cues": ["drip tray", "mug", "brew button"]
+            },
+            {
+              "instruction": "Fill the reservoir with fresh water and run at least 3 rinse cycles (no K-Cup)",
+              "visual_cues": ["fresh water", "brew button"]
+            },
+            {
+              "instruction": "The descale light should turn off. If not, repeat the vinegar cycle",
+              "visual_cues": ["descale indicator light"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dyson-v8",
+      "category": "appliance",
+      "brand": "Dyson",
+      "model": "V8",
+      "aliases": ["Dyson V8 Absolute", "Dyson V8 Animal", "V8 Motorhead"],
+      "common_problems": [
+        {
+          "id": "weak-suction",
+          "problem": "Weak suction or pulsing",
+          "symptoms": ["no suction", "pulsing on and off", "weak", "not picking up"],
+          "difficulty": "easy",
+          "tools_needed": [],
+          "estimated_time": "10 minutes",
+          "safety_warnings": ["Remove from charger before cleaning filters"],
+          "steps": [
+            {
+              "instruction": "Remove the vacuum from the charger and hold it over a bin",
+              "visual_cues": ["wall mount", "pull off charger"]
+            },
+            {
+              "instruction": "Pull the red lever to open the dust bin. Empty it completely",
+              "visual_cues": ["red lever/latch", "bottom of bin opens"]
+            },
+            {
+              "instruction": "Twist the purple filter on top counter-clockwise and pull it out",
+              "visual_cues": ["purple/blue filter cap", "top of unit"]
+            },
+            {
+              "instruction": "Wash the filter under cold running water until water runs clear. Squeeze gently",
+              "visual_cues": ["filter mesh", "rinse under tap"]
+            },
+            {
+              "instruction": "Let the filter dry completely for 24 hours, then replace it. Do NOT use while wet",
+              "visual_cues": ["filter slot", "twist clockwise to lock"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tp-link-archer-ax21",
+      "category": "router",
+      "brand": "TP-Link",
+      "model": "Archer AX21",
+      "aliases": ["AX21", "TP-Link AX1800", "Archer AX1800"],
+      "common_problems": [
+        {
+          "id": "no-internet",
+          "problem": "No internet connection",
+          "symptoms": ["no internet", "orange light", "red light", "not connecting"],
+          "difficulty": "easy",
+          "tools_needed": [],
+          "estimated_time": "5 minutes",
+          "safety_warnings": [],
+          "steps": [
+            {
+              "instruction": "Unplug the power adapter from the back of the router",
+              "visual_cues": ["power port", "DC jack on back"]
+            },
+            {
+              "instruction": "Check that the ethernet cable from your modem is plugged into the WAN port (usually blue)",
+              "visual_cues": ["blue WAN port", "ethernet cable"]
+            },
+            {
+              "instruction": "Wait 30 seconds, then plug the power back in",
+              "visual_cues": ["power adapter", "DC port"]
+            },
+            {
+              "instruction": "Watch the lights on the front. Wait until the internet light turns green (about 2 minutes)",
+              "visual_cues": ["LED indicators", "globe/internet icon"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
