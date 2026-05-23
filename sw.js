@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ar-repair-v11';
+const CACHE_NAME = 'ar-repair-v12';
 const STATIC_ASSETS = [
   './',
   './index.html',
