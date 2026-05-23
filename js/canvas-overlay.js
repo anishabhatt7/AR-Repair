@@ -181,8 +181,8 @@ function drawGlassCard(ctx, w, h, a, state) {
   ctx.fill();
 
   // Border
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   roundRect(ctx, x, y, bw, bh, r);
   ctx.stroke();
@@ -208,10 +208,10 @@ function drawAnimatedArrow(ctx, w, h, a, state) {
   const dotY = y + (ty - y) * progress;
 
   // Arrow shaft (fades behind the moving dot)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 2;
   ctx.lineCap = 'round';
-  ctx.setLineDash([6, 5]);
+  ctx.setLineDash([4, 4]);
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(tx, ty);
@@ -228,7 +228,7 @@ function drawAnimatedArrow(ctx, w, h, a, state) {
   gradient.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
 
   ctx.strokeStyle = gradient;
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 3;
   ctx.lineCap = 'round';
   ctx.beginPath();
   ctx.moveTo(trailX, trailY);
@@ -238,14 +238,14 @@ function drawAnimatedArrow(ctx, w, h, a, state) {
   // Moving dot (the "object" being moved)
   ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
   ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
-  ctx.shadowBlur = 12;
+  ctx.shadowBlur = 8;
   ctx.beginPath();
-  ctx.arc(dotX, dotY, 7, 0, Math.PI * 2);
+  ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
   ctx.fill();
   ctx.shadowBlur = 0;
 
   // Arrowhead at destination (shows where it ends)
-  const headLen = 14;
+  const headLen = 10;
   ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
   ctx.beginPath();
   ctx.moveTo(tx, ty);
@@ -271,8 +271,8 @@ function drawAnimatedCircle(ctx, w, h, a, state) {
   ctx.rotate(state.rotation * Math.PI / 180);
 
   // Outer ring
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.arc(0, 0, radius, 0, Math.PI * 2);
   ctx.stroke();
@@ -283,8 +283,8 @@ function drawAnimatedCircle(ctx, w, h, a, state) {
 
   // If screwing, draw rotation indicator marks
   if (state.rotation > 0) {
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.lineWidth = 1.5;
     for (let i = 0; i < 4; i++) {
       const markAngle = (i * Math.PI) / 2;
       ctx.beginPath();
@@ -313,13 +313,13 @@ function drawGlassCheck(ctx, w, h, a, state) {
   ctx.arc(cx, cy, size, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = 'rgba(76, 175, 80, 0.7)';
-  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(76, 175, 80, 0.6)';
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
   // Checkmark
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
-  ctx.lineWidth = 3.5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+  ctx.lineWidth = 2.5;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.beginPath();
@@ -331,11 +331,11 @@ function drawGlassCheck(ctx, w, h, a, state) {
 
 // ===== Floating Pill Label (matches the Android XR reference) =====
 function drawFloatingPill(ctx, x, y, text) {
-  const fontSize = 14;
-  ctx.font = `500 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+  const fontSize = 12;
+  ctx.font = `400 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
   const metrics = ctx.measureText(text);
-  const padX = 16;
-  const padY = 10;
+  const padX = 14;
+  const padY = 8;
   const boxW = metrics.width + padX * 2;
   const boxH = fontSize + padY * 2;
   const r = boxH / 2;
@@ -344,20 +344,20 @@ function drawFloatingPill(ctx, x, y, text) {
   const drawY = y - boxH / 2;
 
   // Light frosted glass background
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.13)';
   ctx.beginPath();
   roundRect(ctx, drawX, drawY, boxW, boxH, r);
   ctx.fill();
 
   // Subtle border
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+  ctx.lineWidth = 0.75;
   ctx.beginPath();
   roundRect(ctx, drawX, drawY, boxW, boxH, r);
   ctx.stroke();
 
   // White text
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(text, x, y);
