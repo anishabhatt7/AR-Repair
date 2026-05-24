@@ -1,10 +1,25 @@
 import { showScreen, showToast, show, hide } from './ui.js';
 import { startCamera, stopCamera, captureFrame, isCameraSupported } from './camera.js';
-import { initOverlay, renderAnnotations, clearOverlay } from './canvas-overlay.js';
 import { analyzeFrame, cancelAnalysis, hasApiKey, setApiKey, getApiKey, getProvider, setProvider } from './claude-api.js';
 import { loadKnowledgeBase, findProduct, getRepairContext } from './knowledge-base.js';
 import { DEMO_REPAIRS } from './demo-repairs.js';
 import { initChat } from './chat.js';
+
+let initOverlay, renderAnnotations, clearOverlay;
+
+async function loadOverlayModule() {
+  var canvas = document.createElement('canvas');
+  var hasWebGL = !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  var mod;
+  if (hasWebGL) {
+    mod = await import('./three-overlay.js');
+  } else {
+    mod = await import('./canvas-overlay.js');
+  }
+  initOverlay = mod.initOverlay;
+  renderAnnotations = mod.renderAnnotations;
+  clearOverlay = mod.clearOverlay;
+}
 
 let repairData = null;
 let currentStep = 0;
@@ -21,6 +36,7 @@ let chatProblem = '';
 
 async function init() {
   await loadKnowledgeBase();
+  await loadOverlayModule();
   registerServiceWorker();
   bindEvents();
   monitorOnline();
@@ -30,7 +46,7 @@ async function init() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 }
 

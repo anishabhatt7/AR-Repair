@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ar-repair-v17';
+const CACHE_NAME = 'ar-repair-v18';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -7,12 +7,23 @@ const STATIC_ASSETS = [
   './js/chat.js',
   './js/camera.js',
   './js/canvas-overlay.js',
+  './js/three-overlay.js',
   './js/claude-api.js',
   './js/knowledge-base.js',
   './js/demo-repairs.js',
   './js/ui.js',
   './data/repairs.json',
-  './manifest.json'
+  './manifest.json',
+  './lib/three.module.min.js',
+  './lib/postprocessing/EffectComposer.js',
+  './lib/postprocessing/RenderPass.js',
+  './lib/postprocessing/UnrealBloomPass.js',
+  './lib/postprocessing/OutputPass.js',
+  './lib/postprocessing/ShaderPass.js',
+  './lib/postprocessing/Pass.js',
+  './lib/postprocessing/MaskPass.js',
+  './lib/shaders/CopyShader.js',
+  './lib/shaders/LuminosityHighPassShader.js'
 ];
 
 self.addEventListener('install', (event) => {
