@@ -215,6 +215,7 @@ function showRecap() {
   $('record-recording-view').classList.add('hidden');
   $('record-recap-view').classList.remove('hidden');
 
+  const recapBody = $('recap-bullet-list').parentElement;
   const recapList = $('recap-bullet-list');
   recapList.textContent = '';
 
@@ -229,12 +230,9 @@ function showRecap() {
 
   $('btn-confirm-recap').classList.remove('hidden');
 
-  transcribedSteps.forEach((step, i) => {
+  transcribedSteps.forEach((step) => {
     const li = document.createElement('li');
     li.className = 'recap-bullet-item';
-    const strong = document.createElement('strong');
-    strong.textContent = 'Step ' + (i + 1) + ': ';
-    li.appendChild(strong);
     li.appendChild(document.createTextNode(step.text));
     recapList.appendChild(li);
   });
