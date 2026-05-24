@@ -4,7 +4,7 @@ export async function loadKnowledgeBase() {
   if (database) return database;
 
   try {
-    const response = await fetch('/data/repairs.json');
+    const response = await fetch('./data/repairs.json');
     database = await response.json();
   } catch (e) {
     database = { categories: {}, products: [] };

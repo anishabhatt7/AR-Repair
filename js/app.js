@@ -8,17 +8,24 @@ import { initChat } from './chat.js';
 let initOverlay, renderAnnotations, clearOverlay;
 
 async function loadOverlayModule() {
-  var canvas = document.createElement('canvas');
-  var hasWebGL = !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
-  var mod;
-  if (hasWebGL) {
-    mod = await import('./three-overlay.js');
-  } else {
-    mod = await import('./canvas-overlay.js');
+  try {
+    var canvas = document.createElement('canvas');
+    var hasWebGL = !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+    var mod;
+    if (hasWebGL) {
+      mod = await import('./three-overlay.js');
+    } else {
+      mod = await import('./canvas-overlay.js');
+    }
+    initOverlay = mod.initOverlay;
+    renderAnnotations = mod.renderAnnotations;
+    clearOverlay = mod.clearOverlay;
+  } catch (e) {
+    var mod = await import('./canvas-overlay.js');
+    initOverlay = mod.initOverlay;
+    renderAnnotations = mod.renderAnnotations;
+    clearOverlay = mod.clearOverlay;
   }
-  initOverlay = mod.initOverlay;
-  renderAnnotations = mod.renderAnnotations;
-  clearOverlay = mod.clearOverlay;
 }
 
 let repairData = null;
@@ -36,7 +43,7 @@ let chatProblem = '';
 
 async function init() {
   await loadKnowledgeBase();
-  await loadOverlayModule();
+  try { await loadOverlayModule(); } catch (e) { console.warn('Overlay load failed:', e); }
   registerServiceWorker();
   bindEvents();
   monitorOnline();
