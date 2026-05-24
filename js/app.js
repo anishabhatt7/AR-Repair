@@ -14,12 +14,13 @@ let demoMode = false;
 
 const $ = id => document.getElementById(id);
 
+// Stored values from chat for AR scan context
 let chatCategory = '';
 let chatModel = '';
 let chatProblem = '';
 
 async function init() {
-  try { await loadKnowledgeBase(); } catch (e) {}
+  await loadKnowledgeBase();
   registerServiceWorker();
   bindEvents();
   monitorOnline();
@@ -29,7 +30,7 @@ async function init() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 }
 
@@ -45,10 +46,12 @@ function monitorOnline() {
 }
 
 function bindEvents() {
+  // Chat header buttons
   $('btn-chat-settings').addEventListener('click', () => { initSettingsUI(); showScreen('settings'); });
   $('btn-back-settings').addEventListener('click', () => showScreen('chat'));
   $('btn-save-key').addEventListener('click', saveKey);
   $('provider-select').addEventListener('change', onProviderChange);
+  // AR screen controls
   $('btn-menu').addEventListener('click', toggleMenu);
   $('btn-close-menu').addEventListener('click', toggleMenu);
   $('menu-new-repair').addEventListener('click', startOver);
@@ -57,6 +60,8 @@ function bindEvents() {
   $('btn-next').addEventListener('click', nextStep);
   $('btn-rescan').addEventListener('click', rescan);
 }
+
+// === Settings ===
 
 function initSettingsUI() {
   const provider = getProvider();
@@ -93,6 +98,8 @@ function saveKey() {
   showScreen('chat');
 }
 
+// === AR Experience ===
+
 function startARFromChat(category, model, problem) {
   chatCategory = category;
   chatModel = model;
@@ -101,7 +108,17 @@ function startARFromChat(category, model, problem) {
 }
 
 async function startAR() {
+  const category = chatCategory;
+
+  // Use demo mode if no API key
   demoMode = !hasApiKey();
+
+  if (!demoMode && !hasApiKey()) {
+    showToast('Add your API key in Settings first', 'error');
+    initSettingsUI();
+    showScreen('settings');
+    return;
+  }
 
   if (!isCameraSupported()) {
     showToast('Camera not supported', 'error');
@@ -121,7 +138,7 @@ async function startAR() {
     initOverlay(canvas, video);
 
     if (demoMode) {
-      loadDemoRepair(chatCategory);
+      loadDemoRepair(category);
     } else {
       setTimeout(() => performScan(), 500);
     }
@@ -158,7 +175,10 @@ async function performScan() {
   const video = $('camera-feed');
   const base64 = captureFrame(video);
 
-  const productInfo = { category: chatCategory, model: chatModel };
+  const productInfo = {
+    category: chatCategory,
+    model: chatModel
+  };
   const problemDescription = chatProblem;
   const product = findProduct(productInfo.category, productInfo.model);
   const knowledgeContext = product ? getRepairContext(product, problemDescription) : null;
@@ -187,6 +207,7 @@ function showStep() {
   const step = steps[currentStep];
   if (!step) return;
 
+  // Step counter
   show($('step-counter'));
   $('step-number').textContent = currentStep + 1;
   const totalSteps = steps.length;
@@ -194,12 +215,15 @@ function showStep() {
   const progress = ((currentStep + 1) / totalSteps) * circumference;
   $('step-progress').setAttribute('stroke-dashoffset', circumference - progress);
 
+  // Instruction text
   show($('instruction-bar'));
   $('instruction-text').textContent = step.instruction;
 
+  // Navigation buttons
   $('btn-prev').disabled = currentStep === 0;
   $('btn-next').disabled = currentStep === steps.length - 1;
 
+  // Render overlays
   const canvas = $('ar-overlay');
   if (step.annotations && step.annotations.length > 0) {
     renderAnnotations(canvas, step.annotations);
@@ -250,6 +274,8 @@ function scheduleRescan() {
   clearRescanTimer();
   rescanTimer = setTimeout(() => {
     if (!isScanning && document.getElementById('screen-ar').classList.contains('active')) {
+      // Auto-rescan to keep overlays fresh as camera moves
+      // Only rescan current step, don't reset progress
       refreshCurrentStep();
     }
   }, 15000);
@@ -262,7 +288,10 @@ async function refreshCurrentStep() {
   const video = $('camera-feed');
   const base64 = captureFrame(video);
 
-  const productInfo = { category: chatCategory, model: chatModel };
+  const productInfo = {
+    category: chatCategory,
+    model: chatModel
+  };
   const problemDescription = chatProblem;
   const product = findProduct(productInfo.category, productInfo.model);
   const knowledgeContext = product ? getRepairContext(product, problemDescription) : null;
@@ -288,8 +317,11 @@ function clearRescanTimer() {
   }
 }
 
+// === Menu ===
+
 function toggleMenu() {
-  $('menu-panel').classList.toggle('hidden');
+  const panel = $('menu-panel');
+  panel.classList.toggle('hidden');
 }
 
 function startOver() {

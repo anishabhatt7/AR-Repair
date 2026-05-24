@@ -161,7 +161,7 @@ export function initChat(onProblemIdentified) {
   setTimeout(() => {
     addMessage('system', 'Agent joined');
     setTimeout(() => {
-      addMessage(‘agent’, ‘Hey! I’m your AI agent with AR capabilities. Tell me what device you’re having trouble with and I’ll walk you through fixing it step by step.’);
+      addMessage('agent', 'Hey! I’m your repair assistant. Tell me what device you’re having trouble with and I’ll walk you through fixing it step by step with AR guidance.');
     }, 500);
   }, 300);
 
