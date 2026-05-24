@@ -1,8 +1,3 @@
-/**
- * Chat interface module for AR Repair
- * Replaces the form-based setup with a conversational agent UI
- */
-
 const categoryNames = {
   printer: 'printer',
   router: 'router / modem',
@@ -12,10 +7,9 @@ const categoryNames = {
 };
 
 export function initChat(onProblemIdentified) {
-  let conversationState = 'greeting'; // greeting -> asking_device -> asking_problem -> identified
+  let conversationState = 'greeting';
   let detectedCategory = null;
 
-  // DOM references
   const body = document.getElementById('chat-body');
   const input = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-send');
@@ -29,7 +23,6 @@ export function initChat(onProblemIdentified) {
   function createAgentAvatar() {
     const avatar = document.createElement('div');
     avatar.className = 'chat-msg-agent-avatar';
-    // Build SVG via DOM API (no innerHTML)
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('width', '14');
     svg.setAttribute('height', '14');
@@ -44,7 +37,6 @@ export function initChat(onProblemIdentified) {
   }
 
   function addMessage(type, text) {
-    // Remove any existing loading indicator
     if (type !== 'loading') {
       removeLoading();
     }
@@ -121,36 +113,36 @@ export function initChat(onProblemIdentified) {
   }
 
   function processUserMessage(text) {
-    const lower = text.toLowerCase();
+    var lower = text.toLowerCase();
 
     addMessage('loading', 'Looking it up');
 
-    setTimeout(() => {
+    setTimeout(function() {
       removeLoading();
 
       if (conversationState === 'greeting') {
-        let category = identifyCategory(lower);
+        var category = identifyCategory(lower);
         if (category) {
           detectedCategory = category;
           conversationState = 'asking_problem';
-          addMessage('agent', `Got it — a ${categoryNames[category]}. What seems to be the problem with it?`);
+          addMessage('agent', 'Got it - a ' + categoryNames[category] + '. What seems to be the problem with it?');
         } else {
           conversationState = 'asking_device';
           addMessage('agent', 'What type of device are you trying to fix? For example: a printer, router, laptop, phone, or appliance.');
         }
       } else if (conversationState === 'asking_device') {
-        let category = identifyCategory(lower);
+        var category = identifyCategory(lower);
         if (category) {
           detectedCategory = category;
           conversationState = 'asking_problem';
-          addMessage('agent', `A ${categoryNames[category]} — got it. Can you describe what’s going wrong?`);
+          addMessage('agent', 'A ' + categoryNames[category] + ' - got it. Can you describe what is going wrong?');
         } else {
-          addMessage('agent', 'I didn’t quite catch that. Could you tell me what device you’re working with? (printer, router, laptop, phone, appliance)');
+          addMessage('agent', 'I did not quite catch that. Could you tell me what device you are working with? (printer, router, laptop, phone, appliance)');
         }
       } else if (conversationState === 'asking_problem') {
         conversationState = 'identified';
-        addMessage('agent', 'I think I can help with that. Let me set up the AR guide for you — point your camera at the device.');
-        setTimeout(() => {
+        addMessage('agent', 'I think I can help with that. Let me set up the guide for you - point your camera at the device.');
+        setTimeout(function() {
           onProblemIdentified(detectedCategory, '', text);
         }, 1500);
       }
@@ -158,19 +150,18 @@ export function initChat(onProblemIdentified) {
   }
 
   // Start with greeting
-  setTimeout(() => {
+  setTimeout(function() {
     addMessage('system', 'Agent joined');
-    setTimeout(() => {
-      addMessage(‘agent’, ‘Hey! I’m your repair assistant. Tell me what device you’re having trouble with and I’ll walk you through fixing it step by step.’);
+    setTimeout(function() {
+      addMessage('agent', 'Hey! Tell me what device you are having trouble with and I will walk you through fixing it step by step.');
     }, 500);
   }, 300);
 
   // Bind events
   sendBtn.addEventListener('click', handleSend);
-  input.addEventListener('keydown', (e) => {
+  input.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') handleSend();
   });
 
-  // Focus input on load
-  setTimeout(() => input.focus(), 1000);
+  setTimeout(function() { input.focus(); }, 1000);
 }
