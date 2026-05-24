@@ -30,7 +30,7 @@ async function init() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 }
 
@@ -52,6 +52,7 @@ function bindEvents() {
   $('btn-save-key').addEventListener('click', saveKey);
   $('provider-select').addEventListener('change', onProviderChange);
   // AR screen controls
+  $('btn-ar-back').addEventListener('click', startOver);
   $('btn-menu').addEventListener('click', toggleMenu);
   $('btn-close-menu').addEventListener('click', toggleMenu);
   $('menu-new-repair').addEventListener('click', startOver);
@@ -157,9 +158,8 @@ function stopAR() {
   clearRescanTimer();
   stopCamera($('camera-feed'));
   clearOverlay($('ar-overlay'));
-  hide($('step-counter'));
-  hide($('instruction-bar'));
-  hide($('ar-controls'));
+  hide($('ar-top-bar'));
+  hide($('step-card'));
   hide($('ar-status'));
   hide($('menu-panel'));
 }
@@ -169,8 +169,8 @@ async function performScan() {
   isScanning = true;
 
   show($('ar-status'));
-  $('ar-status-text').textContent = 'Scanning...';
-  hide($('ar-controls'));
+  $('ar-status-text').textContent = 'Analyzing device...';
+  hide($('step-card'));
 
   const video = $('camera-feed');
   const base64 = captureFrame(video);
@@ -187,7 +187,6 @@ async function performScan() {
     repairData = await analyzeFrame(base64, productInfo, problemDescription, knowledgeContext);
     currentStep = 0;
     hide($('ar-status'));
-    show($('ar-controls'));
     showStep();
     scheduleRescan();
   } catch (err) {
@@ -200,38 +199,75 @@ async function performScan() {
   }
 }
 
-function showStep() {
+let typingTimer = null;
+
+function showStep(animate = true) {
   if (!repairData || !repairData.repair_steps) return;
 
   const steps = repairData.repair_steps;
   const step = steps[currentStep];
   if (!step) return;
 
-  // Step counter
-  show($('step-counter'));
-  $('step-number').textContent = currentStep + 1;
-  const totalSteps = steps.length;
-  const circumference = 150.8;
-  const progress = ((currentStep + 1) / totalSteps) * circumference;
-  $('step-progress').setAttribute('stroke-dashoffset', circumference - progress);
+  // Show top bar with progress
+  show($('ar-top-bar'));
+  const progressPct = ((currentStep + 1) / steps.length) * 100;
+  $('ar-progress-fill').style.width = progressPct + '%';
 
-  // Instruction text
-  show($('instruction-bar'));
-  $('instruction-text').textContent = step.instruction;
+  // Step card
+  const card = $('step-card');
+  show(card);
+
+  if (animate) {
+    card.classList.remove('entering', 'step-transition');
+    void card.offsetWidth;
+    card.classList.add(currentStep === 0 && card.dataset.shown !== 'true' ? 'entering' : 'step-transition');
+    card.dataset.shown = 'true';
+  }
+
+  // Header
+  $('step-badge').textContent = `STEP ${currentStep + 1}`;
+  $('step-meta').textContent = `of ${steps.length}`;
+
+  // Typing animation for instruction
+  typeText($('step-card-text'), step.instruction);
 
   // Navigation buttons
   $('btn-prev').disabled = currentStep === 0;
   $('btn-next').disabled = currentStep === steps.length - 1;
 
-  // Render overlays
+  // Render overlays with stagger delay
   const canvas = $('ar-overlay');
   if (step.annotations && step.annotations.length > 0) {
-    renderAnnotations(canvas, step.annotations);
+    clearOverlay(canvas);
+    setTimeout(() => {
+      renderAnnotations(canvas, step.annotations);
+    }, animate ? 300 : 0);
   } else {
     clearOverlay(canvas);
   }
 
   if (navigator.vibrate) navigator.vibrate(20);
+}
+
+function typeText(el, text) {
+  if (typingTimer) clearInterval(typingTimer);
+  el.textContent = '';
+  const cursor = document.createElement('span');
+  cursor.className = 'typing-cursor';
+  el.appendChild(cursor);
+
+  let i = 0;
+  typingTimer = setInterval(() => {
+    if (i < text.length) {
+      el.textContent = text.slice(0, i + 1);
+      el.appendChild(cursor);
+      i++;
+    } else {
+      clearInterval(typingTimer);
+      typingTimer = null;
+      cursor.remove();
+    }
+  }, 22);
 }
 
 function prevStep() {
@@ -253,15 +289,12 @@ function loadDemoRepair(category) {
   repairData = demo;
   currentStep = 0;
   hide($('ar-status'));
-  show($('ar-controls'));
   showStep();
 }
 
 function rescan() {
   clearRescanTimer();
   clearOverlay($('ar-overlay'));
-  hide($('instruction-bar'));
-  hide($('step-counter'));
 
   if (demoMode) {
     loadDemoRepair(chatCategory);
