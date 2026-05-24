@@ -100,50 +100,42 @@
     <video id="camera-feed" autoplay playsinline muted></video>
     <canvas id="ar-overlay"></canvas>
 
-    <!-- Top bar: back + progress -->
-    <div id="ar-top-bar" class="ar-top-bar hidden">
-      <button id="btn-ar-back" class="ar-top-btn" aria-label="Back">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-      </button>
-      <div class="ar-progress-bar">
-        <div class="ar-progress-fill" id="ar-progress-fill"></div>
-      </div>
-      <button id="btn-menu" class="ar-top-btn" aria-label="Menu">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-          <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
-        </svg>
-      </button>
+    <!-- HUD: hamburger menu -->
+    <button id="btn-menu" class="hud-btn hud-top-left" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- HUD: step counter -->
+    <div id="step-counter" class="step-counter hidden">
+      <svg width="56" height="56" viewBox="0 0 56 56">
+        <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+        <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="3" id="step-progress" stroke-dasharray="150.8" stroke-dashoffset="0" stroke-linecap="round"/>
+      </svg>
+      <span id="step-number">1</span>
     </div>
 
-    <!-- Step card (bottom sheet) -->
-    <div id="step-card" class="step-card hidden">
-      <div class="step-card-header">
-        <span class="step-card-badge" id="step-badge">STEP 1</span>
-        <span class="step-card-meta" id="step-meta"></span>
-      </div>
-      <p class="step-card-instruction" id="step-card-text"></p>
-      <div class="step-card-nav">
-        <button id="btn-prev" class="step-nav-btn step-nav-prev" aria-label="Previous" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-          <span>Back</span>
-        </button>
-        <button id="btn-rescan" class="step-nav-btn step-nav-rescan" aria-label="Rescan">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          <span>Rescan</span>
-        </button>
-        <button id="btn-next" class="step-nav-btn step-nav-next" aria-label="Next">
-          <span>Next</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
+    <!-- HUD: instruction text -->
+    <div id="instruction-bar" class="instruction-bar hidden">
+      <p id="instruction-text"></p>
     </div>
 
     <!-- HUD: status/loading indicator -->
     <div id="ar-status" class="ar-status hidden">
       <div class="scan-pulse"></div>
-      <p id="ar-status-text">Analyzing device...</p>
+      <p id="ar-status-text">Scanning...</p>
+    </div>
+
+    <!-- HUD: controls at bottom -->
+    <div id="ar-controls" class="ar-controls hidden">
+      <button id="btn-prev" class="ar-nav-btn" aria-label="Previous step">&larr;</button>
+      <button id="btn-rescan" class="ar-scan-btn" aria-label="Rescan">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
+      </button>
+      <button id="btn-next" class="ar-nav-btn" aria-label="Next step">&rarr;</button>
     </div>
 
     <!-- Menu panel (slide out) -->
