@@ -364,4 +364,4 @@ function startOver() {
   showScreen('chat');
 }
 
-document.addEventListener('DOMContentLoaded', () => init());
+init();
