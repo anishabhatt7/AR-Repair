@@ -20,7 +20,7 @@ let chatModel = '';
 let chatProblem = '';
 
 async function init() {
-  await loadKnowledgeBase();
+  try { await loadKnowledgeBase(); } catch (e) { console.warn('Knowledge base load failed:', e); }
   registerServiceWorker();
   bindEvents();
   monitorOnline();
@@ -364,4 +364,4 @@ function startOver() {
   showScreen('chat');
 }
 
-init();
+document.addEventListener('DOMContentLoaded', () => init());
