@@ -57,16 +57,16 @@ export function initOverlay(canvas, videoElement) {
   scene = new THREE.Scene();
   camera = new THREE.OrthographicCamera(0, 1, 0, -1, -100, 100);
 
-  // Lighting for 3D shading
-  var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  // Lighting — strong directional for visible 3D shading
+  var ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
   scene.add(ambientLight);
 
-  var dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-  dirLight.position.set(-1, 1, 3);
+  var dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  dirLight.position.set(-2, 3, 4);
   scene.add(dirLight);
 
-  var fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-  fillLight.position.set(1, -0.5, 2);
+  var fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
+  fillLight.position.set(2, -1, 1);
   scene.add(fillLight);
 
   var renderTarget = new THREE.WebGLRenderTarget(1, 1, {
@@ -287,50 +287,51 @@ function buildArrow(group, a) {
   var tx = (a.target_x != null ? a.target_x : a.x) * viewW;
   var ty = -((a.target_y != null ? a.target_y : a.y - 0.08) * viewH);
 
-  // Solid cylindrical shaft (TubeGeometry)
+  // Solid cylindrical shaft (TubeGeometry) — thick and visible
   var shaftPath = new THREE.LineCurve3(
     new THREE.Vector3(x, y, 0),
     new THREE.Vector3(tx, ty, 0)
   );
-  var shaftGeo = new THREE.TubeGeometry(shaftPath, 20, 3.5, 10, false);
+  var shaftGeo = new THREE.TubeGeometry(shaftPath, 20, 5, 12, false);
   var shaftMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.35,
-    metalness: 0.1,
+    roughness: 0.3,
+    metalness: 0.15,
     transparent: true,
-    opacity: 0.7
+    opacity: 0.8
   });
   var shaft = new THREE.Mesh(shaftGeo, shaftMat);
   group.add(shaft);
 
-  // Chunky arrowhead cone
+  // Chunky arrowhead cone — tilted for 3D perspective
   var angle = Math.atan2(ty - y, tx - x);
-  var coneGeo = new THREE.ConeGeometry(14, 30, 16);
+  var coneGeo = new THREE.ConeGeometry(16, 36, 16);
   var coneMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.25,
-    metalness: 0.15,
+    roughness: 0.2,
+    metalness: 0.2,
     transparent: true,
-    opacity: 0.85,
+    opacity: 0.9,
     emissive: 0xffffff,
-    emissiveIntensity: 0.15
+    emissiveIntensity: 0.2
   });
   var cone = new THREE.Mesh(coneGeo, coneMat);
   cone.position.set(tx, ty, 2);
   cone.rotation.z = angle - Math.PI / 2;
+  cone.rotation.x = 0.3;
   cone.name = 'arrowhead';
   group.add(cone);
 
-  // Traveling dot — solid sphere with emissive glow
-  var dotGeo = new THREE.SphereGeometry(9, 24, 24);
+  // Traveling dot — large solid sphere with strong emissive glow
+  var dotGeo = new THREE.SphereGeometry(12, 32, 32);
   var dotMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.2,
-    metalness: 0.0,
+    roughness: 0.15,
+    metalness: 0.1,
     transparent: true,
     opacity: 1,
     emissive: 0xffffff,
-    emissiveIntensity: 0.6
+    emissiveIntensity: 0.8
   });
   dotMat.toneMapped = false;
   var dot = new THREE.Mesh(dotGeo, dotMat);
@@ -350,9 +351,9 @@ function buildArrow(group, a) {
   trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
   var trailMat = new THREE.PointsMaterial({
     color: 0xffffff,
-    size: 6,
+    size: 8,
     transparent: true,
-    opacity: 0.6,
+    opacity: 0.7,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
@@ -370,35 +371,36 @@ function buildCircle(group, a) {
   var radius = (a.radius || 0.045) * Math.min(viewW, viewH);
   var tubeRadius = Math.max(radius * 0.14, 4);
 
-  // Thick torus ring with shading
+  // Thick torus ring — tilted to show 3D depth
   var torusGeo = new THREE.TorusGeometry(radius, tubeRadius, 20, 48);
   var torusMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.25,
-    metalness: 0.15,
+    roughness: 0.2,
+    metalness: 0.2,
     transparent: true,
-    opacity: 0.85,
+    opacity: 0.9,
     emissive: 0xffffff,
     emissiveIntensity: 0.4
   });
   torusMat.toneMapped = false;
   var torus = new THREE.Mesh(torusGeo, torusMat);
+  torus.rotation.x = 0.6;
   torus.position.z = 2;
   torus.name = 'ring';
   group.add(torus);
 
-  // Inner fill disc with slight depth
-  var discGeo = new THREE.CylinderGeometry(radius * 0.85, radius * 0.85, 2, 32);
+  // Inner fill disc — tilted to match ring
+  var discGeo = new THREE.CylinderGeometry(radius * 0.85, radius * 0.85, 3, 32);
   var discMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     roughness: 0.5,
     metalness: 0.0,
     transparent: true,
-    opacity: 0.06,
+    opacity: 0.08,
     side: THREE.DoubleSide
   });
   var disc = new THREE.Mesh(discGeo, discMat);
-  disc.rotation.x = Math.PI / 2;
+  disc.rotation.x = Math.PI / 2 + 0.6;
   disc.position.z = 0;
   group.add(disc);
 
@@ -451,25 +453,27 @@ function buildBox(group, a) {
   shape.lineTo(-hw, -hh + r);
   shape.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
 
-  // Extruded fill with bevel — gives physical thickness
+  // Extruded fill with bevel — tilted to show 3D depth
   var extrudeSettings = {
-    depth: 5,
+    depth: 8,
     bevelEnabled: true,
-    bevelSize: 2,
-    bevelThickness: 2,
+    bevelSize: 2.5,
+    bevelThickness: 2.5,
     bevelSegments: 3
   };
   var extGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   var extMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.4,
-    metalness: 0.05,
+    roughness: 0.35,
+    metalness: 0.1,
     transparent: true,
-    opacity: 0.1,
+    opacity: 0.15,
     side: THREE.DoubleSide
   });
   var extMesh = new THREE.Mesh(extGeo, extMat);
-  extMesh.position.z = -3;
+  extMesh.rotation.x = 0.15;
+  extMesh.rotation.y = 0.08;
+  extMesh.position.z = -4;
   group.add(extMesh);
 
   // Solid 3D border — TubeGeometry tracing the outline
@@ -500,8 +504,8 @@ function buildCheckmark(group, a) {
   var cy = -(a.y * viewH);
   var size = (a.radius || 0.04) * Math.min(viewW, viewH);
 
-  // Green disc with thickness
-  var discGeo = new THREE.CylinderGeometry(size, size, 4, 32);
+  // Green disc with thickness — tilted for 3D
+  var discGeo = new THREE.CylinderGeometry(size, size, 5, 32);
   var discMat = new THREE.MeshStandardMaterial({
     color: 0x4caf50,
     roughness: 0.4,
@@ -511,21 +515,22 @@ function buildCheckmark(group, a) {
     side: THREE.DoubleSide
   });
   var disc = new THREE.Mesh(discGeo, discMat);
-  disc.rotation.x = Math.PI / 2;
+  disc.rotation.x = Math.PI / 2 + 0.5;
   group.add(disc);
 
-  // Thick ring border
-  var ringGeo = new THREE.TorusGeometry(size, size * 0.1, 16, 48);
+  // Thick ring border — tilted
+  var ringGeo = new THREE.TorusGeometry(size, size * 0.12, 16, 48);
   var ringMat = new THREE.MeshStandardMaterial({
     color: 0x4caf50,
-    roughness: 0.3,
-    metalness: 0.1,
+    roughness: 0.25,
+    metalness: 0.15,
     transparent: true,
-    opacity: 0.8,
+    opacity: 0.85,
     emissive: 0x4caf50,
     emissiveIntensity: 0.3
   });
   var ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = 0.5;
   ring.position.z = 2;
   group.add(ring);
 
