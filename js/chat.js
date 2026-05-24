@@ -159,9 +159,9 @@ export function initChat(onProblemIdentified) {
 
   // Start with greeting
   setTimeout(() => {
-    addMessage('system', 'AR Repair Agent joined');
+    addMessage('system', 'Agent joined');
     setTimeout(() => {
-      addMessage('agent', 'Hey! I’m your AR Repair assistant. Tell me what device you’re having trouble with and I’ll walk you through fixing it step by step.');
+      addMessage('agent', 'Hey! I’m your repair assistant. Tell me what device you’re having trouble with and I’ll walk you through fixing it step by step with AR guidance.');
     }, 500);
   }, 300);
 
