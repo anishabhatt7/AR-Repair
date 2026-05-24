@@ -14,45 +14,49 @@
 </head>
 <body>
 
-  <!-- Setup Screen -->
-  <section id="screen-setup" class="screen active">
-    <div class="setup-content">
-      <h1 class="setup-title">AR Repair</h1>
-      <p class="setup-subtitle">Point your camera. Get visual repair guides.</p>
-
-      <div class="setup-form">
-        <div class="form-group">
-          <label for="product-category">What device?</label>
-          <select id="product-category">
-            <option value="">Select type...</option>
-            <option value="printer">Printer</option>
-            <option value="router">Router / Modem</option>
-            <option value="appliance">Home Appliance</option>
-            <option value="laptop">Laptop / Computer</option>
-            <option value="phone">Phone / Tablet</option>
-            <option value="other">Other</option>
-          </select>
+  <!-- Chat Screen (entry point) -->
+  <section id="screen-chat" class="screen active">
+    <div class="chat-window">
+      <header class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-avatar-header" id="chat-avatar-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1v-1a7 7 0 0 1 7-7h1V5.73A2 2 0 0 1 12 2zm-2 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm4 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="white"/>
+            </svg>
+          </div>
+          <span class="chat-title">AR Repair</span>
         </div>
-
-        <div class="form-group">
-          <label for="product-model">Brand &amp; Model</label>
-          <input type="text" id="product-model" placeholder="e.g. HP DeskJet 2700">
+        <div class="chat-header-right">
+          <button class="chat-icon-btn" id="btn-chat-settings" aria-label="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e2e2e" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+            </svg>
+          </button>
+          <button class="chat-icon-btn" id="btn-chat-minimize" aria-label="Minimize">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e2e2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
         </div>
-
-        <div class="form-group">
-          <label for="problem-description">What's wrong?</label>
-          <textarea id="problem-description" rows="2" placeholder="Describe the problem..."></textarea>
-        </div>
-
-        <label class="demo-toggle-label">
-          <input type="checkbox" id="demo-toggle" checked>
-          <span>Demo Mode (no API key needed)</span>
-        </label>
-
-        <button id="btn-start" class="btn-start" disabled>Start AR Repair</button>
+      </header>
+      <div class="chat-body" id="chat-body">
+        <!-- messages rendered here by chat.js -->
       </div>
-
-      <button id="btn-settings" class="btn-settings">Settings</button>
+      <div class="chat-footer">
+        <div class="chat-composer" id="chat-composer">
+          <button class="chat-composer-icon" id="btn-attach" aria-label="Attach">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5c5c5c" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <input type="text" id="chat-input" placeholder="What can I help you with?" autocomplete="off">
+          <button class="chat-composer-icon" id="btn-send" aria-label="Send">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5c5c5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 

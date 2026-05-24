@@ -4,6 +4,7 @@ import { initOverlay, renderAnnotations, clearOverlay } from './canvas-overlay.j
 import { analyzeFrame, cancelAnalysis, hasApiKey, setApiKey, getApiKey, getProvider, setProvider } from './claude-api.js';
 import { loadKnowledgeBase, findProduct, getRepairContext } from './knowledge-base.js';
 import { DEMO_REPAIRS } from './demo-repairs.js';
+import { initChat } from './chat.js';
 
 let repairData = null;
 let currentStep = 0;
@@ -13,13 +14,18 @@ let demoMode = false;
 
 const $ = id => document.getElementById(id);
 
+// Stored values from chat for AR scan context
+let chatCategory = '';
+let chatModel = '';
+let chatProblem = '';
+
 async function init() {
   await loadKnowledgeBase();
   registerServiceWorker();
   bindEvents();
-  updateStartButton();
   monitorOnline();
   initSettingsUI();
+  initChat(startARFromChat);
 }
 
 function registerServiceWorker() {
@@ -40,13 +46,12 @@ function monitorOnline() {
 }
 
 function bindEvents() {
-  $('product-category').addEventListener('change', updateStartButton);
-  $('problem-description').addEventListener('input', updateStartButton);
-  $('btn-start').addEventListener('click', startAR);
-  $('btn-settings').addEventListener('click', () => { initSettingsUI(); showScreen('settings'); });
-  $('btn-back-settings').addEventListener('click', () => showScreen('setup'));
+  // Chat header buttons
+  $('btn-chat-settings').addEventListener('click', () => { initSettingsUI(); showScreen('settings'); });
+  $('btn-back-settings').addEventListener('click', () => showScreen('chat'));
   $('btn-save-key').addEventListener('click', saveKey);
   $('provider-select').addEventListener('change', onProviderChange);
+  // AR screen controls
   $('btn-menu').addEventListener('click', toggleMenu);
   $('btn-close-menu').addEventListener('click', toggleMenu);
   $('menu-new-repair').addEventListener('click', startOver);
@@ -54,12 +59,6 @@ function bindEvents() {
   $('btn-prev').addEventListener('click', prevStep);
   $('btn-next').addEventListener('click', nextStep);
   $('btn-rescan').addEventListener('click', rescan);
-}
-
-function updateStartButton() {
-  const hasCategory = $('product-category').value !== '';
-  const hasProblem = $('problem-description').value.trim().length > 0;
-  $('btn-start').disabled = !(hasCategory && hasProblem);
 }
 
 // === Settings ===
@@ -96,16 +95,23 @@ function saveKey() {
   setApiKey(key);
   $('api-key-input').value = '••••••••••••••••';
   showToast('Key saved', 'success');
-  showScreen('setup');
+  showScreen('chat');
 }
 
 // === AR Experience ===
 
-async function startAR() {
-  const category = $('product-category').value;
+function startARFromChat(category, model, problem) {
+  chatCategory = category;
+  chatModel = model;
+  chatProblem = problem;
+  startAR();
+}
 
-  // Use demo mode if no API key or demo toggle is on
-  demoMode = !hasApiKey() || $('demo-toggle').checked;
+async function startAR() {
+  const category = chatCategory;
+
+  // Use demo mode if no API key
+  demoMode = !hasApiKey();
 
   if (!demoMode && !hasApiKey()) {
     showToast('Add your API key in Settings first', 'error');
@@ -142,7 +148,7 @@ async function startAR() {
     } else {
       showToast('Camera error: ' + err.message, 'error');
     }
-    showScreen('setup');
+    showScreen('chat');
   }
 }
 
@@ -170,10 +176,10 @@ async function performScan() {
   const base64 = captureFrame(video);
 
   const productInfo = {
-    category: $('product-category').value,
-    model: $('product-model').value
+    category: chatCategory,
+    model: chatModel
   };
-  const problemDescription = $('problem-description').value;
+  const problemDescription = chatProblem;
   const product = findProduct(productInfo.category, productInfo.model);
   const knowledgeContext = product ? getRepairContext(product, problemDescription) : null;
 
@@ -258,8 +264,7 @@ function rescan() {
   hide($('step-counter'));
 
   if (demoMode) {
-    const category = $('product-category').value;
-    loadDemoRepair(category);
+    loadDemoRepair(chatCategory);
   } else {
     performScan();
   }
@@ -284,10 +289,10 @@ async function refreshCurrentStep() {
   const base64 = captureFrame(video);
 
   const productInfo = {
-    category: $('product-category').value,
-    model: $('product-model').value
+    category: chatCategory,
+    model: chatModel
   };
-  const problemDescription = $('problem-description').value;
+  const problemDescription = chatProblem;
   const product = findProduct(productInfo.category, productInfo.model);
   const knowledgeContext = product ? getRepairContext(product, problemDescription) : null;
 
@@ -323,7 +328,7 @@ function startOver() {
   stopAR();
   repairData = null;
   currentStep = 0;
-  showScreen('setup');
+  showScreen('chat');
 }
 
 init();

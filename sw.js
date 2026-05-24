@@ -1,9 +1,10 @@
-const CACHE_NAME = 'ar-repair-v14';
+const CACHE_NAME = 'ar-repair-v15';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './css/styles.css',
   './js/app.js',
+  './js/chat.js',
   './js/camera.js',
   './js/canvas-overlay.js',
   './js/claude-api.js',
