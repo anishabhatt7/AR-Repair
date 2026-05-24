@@ -57,6 +57,18 @@ export function initOverlay(canvas, videoElement) {
   scene = new THREE.Scene();
   camera = new THREE.OrthographicCamera(0, 1, 0, -1, -100, 100);
 
+  // Lighting for 3D shading
+  var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+
+  var dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+  dirLight.position.set(-1, 1, 3);
+  scene.add(dirLight);
+
+  var fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+  fillLight.position.set(1, -0.5, 2);
+  scene.add(fillLight);
+
   var renderTarget = new THREE.WebGLRenderTarget(1, 1, {
     type: THREE.HalfFloatType,
     format: THREE.RGBAFormat
@@ -267,7 +279,7 @@ function disposeScene() {
   labelElements = [];
 }
 
-// === Build Primitives ===
+// === Build Primitives (3D volumetric) ===
 
 function buildArrow(group, a) {
   var x = a.x * viewW;
@@ -275,48 +287,70 @@ function buildArrow(group, a) {
   var tx = (a.target_x != null ? a.target_x : a.x) * viewW;
   var ty = -((a.target_y != null ? a.target_y : a.y - 0.08) * viewH);
 
-  // Dashed shaft line
-  var points = [new THREE.Vector3(x, y, 0), new THREE.Vector3(tx, ty, 0)];
-  var lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-  var lineMat = new THREE.LineDashedMaterial({
+  // Solid cylindrical shaft (TubeGeometry)
+  var shaftPath = new THREE.LineCurve3(
+    new THREE.Vector3(x, y, 0),
+    new THREE.Vector3(tx, ty, 0)
+  );
+  var shaftGeo = new THREE.TubeGeometry(shaftPath, 20, 3.5, 10, false);
+  var shaftMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    opacity: 0.4,
+    roughness: 0.35,
+    metalness: 0.1,
     transparent: true,
-    dashSize: 8,
-    gapSize: 6
+    opacity: 0.7
   });
-  var line = new THREE.Line(lineGeo, lineMat);
-  line.computeLineDistances();
-  group.add(line);
+  var shaft = new THREE.Mesh(shaftGeo, shaftMat);
+  group.add(shaft);
 
-  // Traveling dot (emissive for bloom)
-  var dotGeo = new THREE.SphereGeometry(6, 16, 16);
-  var dotMat = new THREE.MeshBasicMaterial({
+  // Chunky arrowhead cone
+  var angle = Math.atan2(ty - y, tx - x);
+  var coneGeo = new THREE.ConeGeometry(14, 30, 16);
+  var coneMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
+    roughness: 0.25,
+    metalness: 0.15,
     transparent: true,
-    opacity: 1
+    opacity: 0.85,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.15
+  });
+  var cone = new THREE.Mesh(coneGeo, coneMat);
+  cone.position.set(tx, ty, 2);
+  cone.rotation.z = angle - Math.PI / 2;
+  cone.name = 'arrowhead';
+  group.add(cone);
+
+  // Traveling dot — solid sphere with emissive glow
+  var dotGeo = new THREE.SphereGeometry(9, 24, 24);
+  var dotMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.2,
+    metalness: 0.0,
+    transparent: true,
+    opacity: 1,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.6
   });
   dotMat.toneMapped = false;
   var dot = new THREE.Mesh(dotGeo, dotMat);
   dot.name = 'dot';
-  dot.position.set(x, y, 1);
+  dot.position.set(x, y, 4);
   group.add(dot);
 
   // Particle trail
-  var trailCount = 8;
+  var trailCount = 10;
   var trailPositions = new Float32Array(trailCount * 3);
-  var trailOpacities = new Float32Array(trailCount);
   for (var i = 0; i < trailCount; i++) {
     trailPositions[i * 3] = x;
     trailPositions[i * 3 + 1] = y;
-    trailPositions[i * 3 + 2] = 0;
-    trailOpacities[i] = (trailCount - i) / trailCount;
+    trailPositions[i * 3 + 2] = 3;
   }
   var trailGeo = new THREE.BufferGeometry();
   trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
   var trailMat = new THREE.PointsMaterial({
     color: 0xffffff,
-    size: 4,
+    size: 6,
     transparent: true,
     opacity: 0.6,
     blending: THREE.AdditiveBlending,
@@ -326,64 +360,65 @@ function buildArrow(group, a) {
   trail.name = 'trail';
   group.add(trail);
 
-  // Arrowhead (cone)
-  var angle = Math.atan2(ty - y, tx - x);
-  var coneGeo = new THREE.ConeGeometry(7, 16, 8);
-  var coneMat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.7
-  });
-  var cone = new THREE.Mesh(coneGeo, coneMat);
-  cone.position.set(tx, ty, 0);
-  cone.rotation.z = angle - Math.PI / 2;
-  cone.name = 'arrowhead';
-  group.add(cone);
-
-  group.userData.start = new THREE.Vector3(x, y, 1);
-  group.userData.end = new THREE.Vector3(tx, ty, 1);
+  group.userData.start = new THREE.Vector3(x, y, 4);
+  group.userData.end = new THREE.Vector3(tx, ty, 4);
 }
 
 function buildCircle(group, a) {
   var cx = a.x * viewW;
   var cy = -(a.y * viewH);
   var radius = (a.radius || 0.045) * Math.min(viewW, viewH);
+  var tubeRadius = Math.max(radius * 0.14, 4);
 
-  // Outer ring (torus)
-  var torusGeo = new THREE.TorusGeometry(radius, 2, 8, 48);
-  var torusMat = new THREE.MeshBasicMaterial({
+  // Thick torus ring with shading
+  var torusGeo = new THREE.TorusGeometry(radius, tubeRadius, 20, 48);
+  var torusMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
+    roughness: 0.25,
+    metalness: 0.15,
     transparent: true,
-    opacity: 0.8
+    opacity: 0.85,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.4
   });
   torusMat.toneMapped = false;
   var torus = new THREE.Mesh(torusGeo, torusMat);
+  torus.position.z = 2;
   torus.name = 'ring';
   group.add(torus);
 
-  // Inner fill (very subtle)
-  var circleGeo = new THREE.CircleGeometry(radius * 0.9, 32);
-  var circleMat = new THREE.MeshBasicMaterial({
+  // Inner fill disc with slight depth
+  var discGeo = new THREE.CylinderGeometry(radius * 0.85, radius * 0.85, 2, 32);
+  var discMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
+    roughness: 0.5,
+    metalness: 0.0,
     transparent: true,
-    opacity: 0.05,
+    opacity: 0.06,
     side: THREE.DoubleSide
   });
-  var circle = new THREE.Mesh(circleGeo, circleMat);
-  circle.position.z = -1;
-  group.add(circle);
+  var disc = new THREE.Mesh(discGeo, discMat);
+  disc.rotation.x = Math.PI / 2;
+  disc.position.z = 0;
+  group.add(disc);
 
-  // Tick marks for screw type
+  // Tick marks for screw type — chunky cylinders
   if (a.label && a.label.toLowerCase().indexOf('screw') >= 0) {
     for (var i = 0; i < 4; i++) {
       var markAngle = (i * Math.PI) / 2;
-      var markGeo = new THREE.CylinderGeometry(1.5, 1.5, radius * 0.25, 6);
-      var markMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
+      var markGeo = new THREE.CylinderGeometry(3.5, 3.5, radius * 0.3, 12);
+      var markMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.3,
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.7
+      });
       var mark = new THREE.Mesh(markGeo, markMat);
       mark.position.set(
-        Math.cos(markAngle) * radius * 0.7,
-        Math.sin(markAngle) * radius * 0.7,
-        0
+        Math.cos(markAngle) * radius * 0.65,
+        Math.sin(markAngle) * radius * 0.65,
+        2
       );
       mark.rotation.z = markAngle;
       group.add(mark);
@@ -398,12 +433,12 @@ function buildBox(group, a) {
   var y = -(a.y * viewH);
   var bw = (a.width || 0.2) * viewW;
   var bh = (a.height || 0.12) * viewH;
-  var cx = x + bw / 2;
-  var cy = y - bh / 2;
+  var centerX = x + bw / 2;
+  var centerY = y - bh / 2;
 
-  // Rounded rectangle outline
+  // Rounded rectangle shape
   var shape = new THREE.Shape();
-  var r = 12;
+  var r = 14;
   var hw = bw / 2;
   var hh = bh / 2;
   shape.moveTo(-hw + r, -hh);
@@ -416,33 +451,48 @@ function buildBox(group, a) {
   shape.lineTo(-hw, -hh + r);
   shape.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
 
-  var edgePoints = shape.getPoints(48);
-  var edgeGeo = new THREE.BufferGeometry().setFromPoints(
-    edgePoints.map(function(p) { return new THREE.Vector3(p.x, p.y, 0); })
-  );
-  var edgeMat = new THREE.LineBasicMaterial({
+  // Extruded fill with bevel — gives physical thickness
+  var extrudeSettings = {
+    depth: 5,
+    bevelEnabled: true,
+    bevelSize: 2,
+    bevelThickness: 2,
+    bevelSegments: 3
+  };
+  var extGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  var extMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
+    roughness: 0.4,
+    metalness: 0.05,
     transparent: true,
-    opacity: 0.6
-  });
-  edgeMat.toneMapped = false;
-  var edge = new THREE.LineLoop(edgeGeo, edgeMat);
-  edge.name = 'border';
-  group.add(edge);
-
-  // Fill
-  var fillGeo = new THREE.ShapeGeometry(shape);
-  var fillMat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.06,
+    opacity: 0.1,
     side: THREE.DoubleSide
   });
-  var fill = new THREE.Mesh(fillGeo, fillMat);
-  fill.position.z = -1;
-  group.add(fill);
+  var extMesh = new THREE.Mesh(extGeo, extMat);
+  extMesh.position.z = -3;
+  group.add(extMesh);
 
-  group.position.set(cx, cy, 0);
+  // Solid 3D border — TubeGeometry tracing the outline
+  var borderPoints = shape.getPoints(48);
+  var borderVectors = borderPoints.map(function(p) { return new THREE.Vector3(p.x, p.y, 2); });
+  borderVectors.push(borderVectors[0].clone());
+  var borderCurve = new THREE.CatmullRomCurve3(borderVectors, false);
+  var borderGeo = new THREE.TubeGeometry(borderCurve, 64, 2.5, 10, false);
+  var borderMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.3,
+    metalness: 0.1,
+    transparent: true,
+    opacity: 0.7,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.2
+  });
+  borderMat.toneMapped = false;
+  var border = new THREE.Mesh(borderGeo, borderMat);
+  border.name = 'border';
+  group.add(border);
+
+  group.position.set(centerX, centerY, 0);
 }
 
 function buildCheckmark(group, a) {
@@ -450,36 +500,53 @@ function buildCheckmark(group, a) {
   var cy = -(a.y * viewH);
   var size = (a.radius || 0.04) * Math.min(viewW, viewH);
 
-  // Green circle bg
-  var circleGeo = new THREE.CircleGeometry(size, 32);
-  var circleMat = new THREE.MeshBasicMaterial({
+  // Green disc with thickness
+  var discGeo = new THREE.CylinderGeometry(size, size, 4, 32);
+  var discMat = new THREE.MeshStandardMaterial({
     color: 0x4caf50,
+    roughness: 0.4,
+    metalness: 0.05,
     transparent: true,
-    opacity: 0.2,
+    opacity: 0.25,
     side: THREE.DoubleSide
   });
-  var circle = new THREE.Mesh(circleGeo, circleMat);
-  group.add(circle);
+  var disc = new THREE.Mesh(discGeo, discMat);
+  disc.rotation.x = Math.PI / 2;
+  group.add(disc);
 
-  // Circle border
-  var ringGeo = new THREE.TorusGeometry(size, 1.5, 8, 48);
-  var ringMat = new THREE.MeshBasicMaterial({
+  // Thick ring border
+  var ringGeo = new THREE.TorusGeometry(size, size * 0.1, 16, 48);
+  var ringMat = new THREE.MeshStandardMaterial({
     color: 0x4caf50,
+    roughness: 0.3,
+    metalness: 0.1,
     transparent: true,
-    opacity: 0.7
+    opacity: 0.8,
+    emissive: 0x4caf50,
+    emissiveIntensity: 0.3
   });
   var ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.position.z = 2;
   group.add(ring);
 
-  // Checkmark line
+  // Checkmark as solid tube
   var checkPoints = [
-    new THREE.Vector3(-size * 0.35, -size * 0.05, 1),
-    new THREE.Vector3(-size * 0.05, -size * 0.3, 1),
-    new THREE.Vector3(size * 0.4, size * 0.25, 1)
+    new THREE.Vector3(-size * 0.35, -size * 0.05, 4),
+    new THREE.Vector3(-size * 0.05, -size * 0.3, 4),
+    new THREE.Vector3(size * 0.4, size * 0.25, 4)
   ];
-  var checkGeo = new THREE.BufferGeometry().setFromPoints(checkPoints);
-  var checkMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
-  var check = new THREE.Line(checkGeo, checkMat);
+  var checkCurve = new THREE.CatmullRomCurve3(checkPoints, false);
+  var checkGeo = new THREE.TubeGeometry(checkCurve, 16, 3, 10, false);
+  var checkMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.2,
+    metalness: 0.0,
+    transparent: true,
+    opacity: 0.9,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.2
+  });
+  var check = new THREE.Mesh(checkGeo, checkMat);
   check.name = 'check';
   group.add(check);
 
@@ -503,9 +570,10 @@ function updateAnnotation(group, a, state) {
 
     if (trail) {
       var positions = trail.geometry.attributes.position.array;
-      for (var i = 7; i > 0; i--) {
+      for (var i = 9; i > 0; i--) {
         positions[i * 3] = positions[(i - 1) * 3];
         positions[i * 3 + 1] = positions[(i - 1) * 3 + 1];
+        positions[i * 3 + 2] = positions[(i - 1) * 3 + 2];
       }
       if (dot) {
         positions[0] = dot.position.x;
@@ -518,33 +586,39 @@ function updateAnnotation(group, a, state) {
 
     group.children.forEach(function(child) {
       if (child.material && child !== dot && child !== trail) {
-        child.material.opacity = Math.min(child.material.opacity, state.opacity * 0.7);
+        if (child.material.opacity > state.opacity * 0.85) {
+          child.material.opacity = state.opacity * 0.85;
+        }
       }
     });
 
   } else if (a.type === 'circle') {
     var ring = group.getObjectByName('ring');
     if (ring) {
-      ring.material.opacity = state.opacity * 0.8;
+      ring.material.opacity = state.opacity * 0.85;
     }
     group.scale.setScalar(state.pulseScale * state.scale);
     group.rotation.z = state.rotation * Math.PI / 180;
     group.children.forEach(function(child) {
-      if (child.material) child.material.opacity = Math.min(child.material.opacity + 0.01, state.opacity);
+      if (child.material && child.material.opacity < state.opacity) {
+        child.material.opacity = Math.min(child.material.opacity + 0.02, state.opacity);
+      }
     });
 
   } else if (a.type === 'box' || a.type === '3d_box' || a.type === 'highlight') {
     group.scale.setScalar(state.pulseScale * state.scale);
     var border = group.getObjectByName('border');
     if (border) {
-      border.material.opacity = state.opacity * 0.6;
+      border.material.opacity = state.opacity * 0.7;
     }
 
   } else if (a.type === 'checkmark') {
     group.scale.setScalar(state.scale);
     group.children.forEach(function(child) {
       if (child.material) {
-        child.material.opacity = Math.min(child.material.opacity + 0.01, state.opacity);
+        if (child.material.opacity < state.opacity) {
+          child.material.opacity = Math.min(child.material.opacity + 0.02, state.opacity);
+        }
       }
     });
   }
