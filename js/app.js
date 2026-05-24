@@ -4,6 +4,7 @@ import { analyzeFrame, cancelAnalysis, hasApiKey, setApiKey, getApiKey, getProvi
 import { loadKnowledgeBase, findProduct, getRepairContext } from './knowledge-base.js';
 import { DEMO_REPAIRS } from './demo-repairs.js';
 import { initChat } from './chat.js';
+import { initRecord, startRecordFlow } from './record.js';
 
 let initOverlay, renderAnnotations, clearOverlay;
 
@@ -36,7 +37,6 @@ let demoMode = false;
 
 const $ = id => document.getElementById(id);
 
-// Stored values from chat for AR scan context
 let chatCategory = '';
 let chatModel = '';
 let chatProblem = '';
@@ -49,6 +49,7 @@ async function init() {
   monitorOnline();
   initSettingsUI();
   initChat(startARFromChat);
+  initRecord();
 }
 
 function registerServiceWorker() {
@@ -69,15 +70,25 @@ function monitorOnline() {
 }
 
 function bindEvents() {
-  // Chat header buttons
+  // Home screen
+  $('btn-mode-troubleshoot').addEventListener('click', () => showScreen('chat'));
+  $('btn-mode-record').addEventListener('click', () => startRecordFlow());
+  $('btn-home-settings').addEventListener('click', () => { initSettingsUI(); showScreen('settings'); });
+
+  // Chat screen
+  $('btn-chat-back').addEventListener('click', () => showScreen('home'));
   $('btn-chat-settings').addEventListener('click', () => { initSettingsUI(); showScreen('settings'); });
-  $('btn-back-settings').addEventListener('click', () => showScreen('chat'));
+
+  // Settings
+  $('btn-back-settings').addEventListener('click', () => showScreen('home'));
   $('btn-save-key').addEventListener('click', saveKey);
   $('provider-select').addEventListener('change', onProviderChange);
+
   // AR screen controls
   $('btn-menu').addEventListener('click', toggleMenu);
   $('btn-close-menu').addEventListener('click', toggleMenu);
   $('menu-new-repair').addEventListener('click', startOver);
+  $('menu-record-fix').addEventListener('click', () => { toggleMenu(); stopAR(); startRecordFlow(); });
   $('menu-settings').addEventListener('click', () => { stopAR(); initSettingsUI(); showScreen('settings'); });
   $('btn-prev').addEventListener('click', prevStep);
   $('btn-next').addEventListener('click', nextStep);
@@ -118,7 +129,7 @@ function saveKey() {
   setApiKey(key);
   $('api-key-input').value = '••••••••••••••••';
   showToast('Key saved', 'success');
-  showScreen('chat');
+  showScreen('home');
 }
 
 // === AR Experience ===
@@ -133,7 +144,6 @@ function startARFromChat(category, model, problem) {
 async function startAR() {
   const category = chatCategory;
 
-  // Use demo mode if no API key
   demoMode = !hasApiKey();
 
   if (!demoMode && !hasApiKey()) {
@@ -230,7 +240,6 @@ function showStep() {
   const step = steps[currentStep];
   if (!step) return;
 
-  // Step counter
   show($('step-counter'));
   $('step-number').textContent = currentStep + 1;
   const totalSteps = steps.length;
@@ -238,15 +247,12 @@ function showStep() {
   const progress = ((currentStep + 1) / totalSteps) * circumference;
   $('step-progress').setAttribute('stroke-dashoffset', circumference - progress);
 
-  // Instruction text
   show($('instruction-bar'));
   $('instruction-text').textContent = step.instruction;
 
-  // Navigation buttons
   $('btn-prev').disabled = currentStep === 0;
   $('btn-next').disabled = currentStep === steps.length - 1;
 
-  // Render overlays
   const canvas = $('ar-overlay');
   if (step.annotations && step.annotations.length > 0) {
     renderAnnotations(canvas, step.annotations);
@@ -297,8 +303,6 @@ function scheduleRescan() {
   clearRescanTimer();
   rescanTimer = setTimeout(() => {
     if (!isScanning && document.getElementById('screen-ar').classList.contains('active')) {
-      // Auto-rescan to keep overlays fresh as camera moves
-      // Only rescan current step, don't reset progress
       refreshCurrentStep();
     }
   }, 15000);
@@ -351,7 +355,7 @@ function startOver() {
   stopAR();
   repairData = null;
   currentStep = 0;
-  showScreen('chat');
+  showScreen('home');
 }
 
 init();

@@ -29,8 +29,11 @@ body {
 }
 .screen.active { display: flex; }
 
-/* Chat Screen */
-#screen-chat {
+/* Shared chat-window card */
+#screen-home,
+#screen-chat,
+#screen-record,
+#screen-article {
   background: #f0f0f0;
   align-items: center;
   justify-content: center;
@@ -55,7 +58,10 @@ body {
     max-height: 100%;
     border-radius: 0;
   }
-  #screen-chat {
+  #screen-home,
+  #screen-chat,
+  #screen-record,
+  #screen-article {
     padding: 0;
   }
 }
@@ -283,6 +289,79 @@ body {
   background: #f0f0f0;
 }
 
+/* ===== HOME SCREEN ===== */
+.home-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 32px;
+}
+
+.home-greeting-text {
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  color: #5c5c5c;
+  text-align: center;
+}
+
+.home-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.home-choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.home-choice-btn:active {
+  background: #f5f5f5;
+}
+
+.home-choice-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.home-choice-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.home-choice-title {
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  color: #2e2e2e;
+}
+
+.home-choice-desc {
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  color: #5c5c5c;
+}
+
 /* Settings Screen */
 #screen-settings {
   background: var(--bg);
@@ -496,7 +575,7 @@ select {
   z-index: 1;
 }
 
-/* Instruction Bar - Glass pill (matches Android XR reference) */
+/* Instruction Bar */
 .instruction-bar {
   position: absolute;
   bottom: 90px;
@@ -524,7 +603,7 @@ select {
   text-overflow: ellipsis;
 }
 
-/* AR Status (scanning indicator) - Glass style */
+/* AR Status */
 .ar-status {
   position: absolute;
   top: 50%;
@@ -563,7 +642,7 @@ select {
   50% { transform: scale(1.5); opacity: 0.2; }
 }
 
-/* AR Controls (bottom nav) - Glass capsule */
+/* AR Controls */
 .ar-controls {
   position: absolute;
   bottom: 24px;
@@ -675,6 +754,330 @@ select {
   font-size: 0.8rem;
   font-weight: 600;
   z-index: 100;
+}
+
+/* ===== RECORD SCREEN ===== */
+.record-split {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.record-video-area {
+  position: relative;
+  flex: 1;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+.record-video-area video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.record-step-pills {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.record-step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 10px;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  color: #fff;
+}
+
+.record-step-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2e2e2e;
+  color: #fff;
+  font-weight: 700;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.record-step-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Voice area */
+.record-voice-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px;
+  gap: 10px;
+  background: #ffffff;
+}
+
+.record-status-text {
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  color: #5c5c5c;
+  text-align: center;
+}
+
+.record-transcript-area {
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  color: #2e2e2e;
+  text-align: center;
+  min-height: 20px;
+  max-height: 60px;
+  overflow-y: auto;
+  padding: 0 8px;
+  line-height: 1.4;
+}
+
+/* Listening animation */
+.listening-animation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 28px;
+}
+
+.listening-bar {
+  width: 3px;
+  height: 6px;
+  background: #2e2e2e;
+  border-radius: 2px;
+  animation: listening-pulse 1.2s ease-in-out infinite;
+}
+
+.listening-bar:nth-child(1) { animation-delay: 0s; }
+.listening-bar:nth-child(2) { animation-delay: 0.15s; }
+.listening-bar:nth-child(3) { animation-delay: 0.3s; }
+.listening-bar:nth-child(4) { animation-delay: 0.45s; }
+.listening-bar:nth-child(5) { animation-delay: 0.6s; }
+
+@keyframes listening-pulse {
+  0%, 100% { height: 6px; opacity: 0.4; }
+  50% { height: 20px; opacity: 1; }
+}
+
+/* Record indicator */
+.record-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.record-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b30;
+  animation: rec-blink 1s ease-in-out infinite;
+}
+
+@keyframes rec-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.record-indicator-text {
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  color: #ff3b30;
+  letter-spacing: 0.5px;
+}
+
+/* Record footer controls */
+.record-footer {
+  border-top: 1px solid #e8e8e8;
+}
+
+.record-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.record-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+}
+
+.record-action-start {
+  background: #ff3b30;
+  color: #fff;
+}
+
+.record-action-stop {
+  background: #ff3b30;
+  color: #fff;
+}
+
+.record-action-step {
+  background: #e0e5f1;
+  color: #2e2e2e;
+}
+
+.record-action-step:active {
+  background: #d0d5e1;
+}
+
+/* Recap (inside chat-window) */
+.recap-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.recap-bullet-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recap-bullet-item {
+  padding: 10px 14px;
+  background: #f5f5f5;
+  border-radius: 12px;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  color: #2e2e2e;
+  line-height: 1.4;
+  border-left: 3px solid #2e2e2e;
+}
+
+.recap-empty {
+  color: #5c5c5c;
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+}
+
+.recap-summary-text {
+  margin-top: 16px;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  color: #5c5c5c;
+  text-align: center;
+}
+
+.recap-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.record-action-confirm {
+  background: #2e2e2e;
+  color: #fff;
+}
+
+.record-action-redo {
+  background: transparent;
+  color: #5c5c5c;
+  border: 1px solid #d0d0d0;
+}
+
+/* ===== ARTICLE SCREEN ===== */
+.article-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.article-title {
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  color: #2e2e2e;
+  margin-bottom: 6px;
+}
+
+.article-meta {
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  color: #5c5c5c;
+  margin-bottom: 16px;
+}
+
+.article-divider {
+  border: none;
+  border-top: 1px solid #e8e8e8;
+  margin-bottom: 20px;
+}
+
+.article-step {
+  margin-bottom: 24px;
+}
+
+.article-step-heading {
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  color: #2e2e2e;
+  margin-bottom: 10px;
+}
+
+.article-step-image {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  border: 1px solid #e8e8e8;
+}
+
+.article-step-text {
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  color: #2e2e2e;
+  line-height: 1.5;
+}
+
+.article-video-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.article-video {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 10px;
 }
 
 .hidden { display: none !important; }
