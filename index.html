@@ -223,12 +223,15 @@
           </div>
         </header>
         <!-- Split: top video, bottom voice -->
-        <div class="record-split">
-          <div class="record-video-area">
+        <div class="record-split" id="record-split">
+          <div class="record-video-area" id="record-video-area">
             <video id="record-video" autoplay playsinline muted></video>
             <div id="record-step-list" class="record-step-pills"></div>
           </div>
-          <div class="record-voice-area">
+          <div class="record-split-handle" id="record-split-handle">
+            <div class="record-split-handle-bar"></div>
+          </div>
+          <div class="record-voice-area" id="record-voice-area">
             <div id="listening-animation" class="listening-animation hidden">
               <span class="listening-bar"></span>
               <span class="listening-bar"></span>

@@ -20,6 +20,57 @@ export function initRecord() {
   $('btn-back-record').addEventListener('click', exitRecording);
   $('btn-recap-back').addEventListener('click', redoRecording);
   $('btn-back-article').addEventListener('click', exitArticle);
+  initSplitToggle();
+}
+
+function initSplitToggle() {
+  const split = $('record-split');
+  const handle = $('record-split-handle');
+  const videoArea = $('record-video-area');
+  const voiceArea = $('record-voice-area');
+  let currentState = 'half'; // half | video | voice
+
+  handle.addEventListener('click', () => {
+    if (currentState === 'half') {
+      currentState = 'video';
+    } else if (currentState === 'video') {
+      currentState = 'voice';
+    } else {
+      currentState = 'half';
+    }
+    applySplitState();
+  });
+
+  let lastTapVideo = 0;
+  videoArea.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTapVideo < 300) {
+      e.preventDefault();
+      currentState = currentState === 'video' ? 'half' : 'video';
+      applySplitState();
+    }
+    lastTapVideo = now;
+  });
+
+  let lastTapVoice = 0;
+  voiceArea.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTapVoice < 300) {
+      e.preventDefault();
+      currentState = currentState === 'voice' ? 'half' : 'voice';
+      applySplitState();
+    }
+    lastTapVoice = now;
+  });
+
+  function applySplitState() {
+    split.classList.remove('video-expanded', 'voice-expanded');
+    if (currentState === 'video') {
+      split.classList.add('video-expanded');
+    } else if (currentState === 'voice') {
+      split.classList.add('voice-expanded');
+    }
+  }
 }
 
 function exitRecording() {
